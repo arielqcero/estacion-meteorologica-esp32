@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Estación Meteorológica</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: #e0e0e0;
+        padding: 20px;
+        margin: 0;
+    }
+
+    h1 {
+        text-align: center;
+        color: #ffffff;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: #1e1e1e;
+        padding: 15px;
+        margin: 10px auto;
+        border-radius: 10px;
+        width: 350px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        border: 1px solid #333;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #90caf9;
+    }
+
+    .value {
+        color: #ffffff;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .estado-normal {
+    border-left: 6px solid #4caf50; /* verde */
+    }
+    .estado-lpw {
+        border-left: 6px solid #ffeb3b; /* amarillo */
+    }
+    .estado-hbn {
+        border-left: 6px solid #f44336; /* rojo */
+    }
+
+</style>
+</head>
+<body>
+
+<h1>🌙 Estación Meteorológica — Modo Oscuro</h1>
+
+<div class="container">
+    <div class="card" id="estado"></div>
+    <div class="card" id="bateria"></div>
+    <div class="card" id="sensores"></div>
+    <div class="card" id="prox"></div>
+</div>
+
+<div style="text-align:center; margin-top:20px;">
+    <a href="/graficos" 
+       style="background:#90caf9; padding:10px 20px; border-radius:8px; color:#000; text-decoration:none; font-weight:bold;">
+       Ver gráficos históricos
+    </a>
+</div>
+
+
+<script>
+async function actualizar() {
+    const res = await fetch("/latest");
+    const data = await res.json();
+
+    let estadoCard = document.getElementById("estado");
+    estadoCard.className = "card"; // reset
+    if (data.estado === "nml") estadoCard.classList.add("estado-normal");
+    if (data.estado === "lpw") estadoCard.classList.add("estado-lpw");
+    if (data.estado === "hbn") estadoCard.classList.add("estado-hbn");
+
+    document.getElementById("estado").innerHTML =
+        `<span class='label'>Estado:</span> <span class='value'>${data.estado}</span><br>
+         <span class='label'>Fecha/Hora:</span> <span class='value'>${data.fechaHora}</span>`;
+
+    document.getElementById("bateria").innerHTML =
+        `<span class='label'>Batería:</span><br>
+         <span class='value'>Voltaje: ${data.bateria.volt} V</span><br>
+         <span class='value'>Porcentaje: ${data.bateria.porcentaje}%</span>`;
+
+    document.getElementById("sensores").innerHTML =
+        `<span class='label'>Sensores:</span><br>
+         <span class='value'>Temp: ${data.sensores.temperatura} °C</span><br>
+         <span class='value'>Humedad: ${data.sensores.humedad} %</span><br>
+         <span class='value'>Presión: ${data.sensores.presion} hPa</span><br>
+         <span class='value'>Luz: ${data.sensores.luz}</span><br>
+         <span class='value'>Viento: ${data.sensores.viento} m/s</span>`;
+
+    document.getElementById("prox").innerHTML =
+        `<span class='label'>Próximo envío:</span> <span class='value'>${data.proxEnvio}</span>`;
+}
+
+actualizar();
+setInterval(actualizar, 10000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Base de datos local
+*.db
+
+# Archivos temporales
+__pycache__/
+*.pyc
+
+# Entornos virtuales
+venv/
+env/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
